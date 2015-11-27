@@ -212,12 +212,12 @@ class NxTranslate():
                         print "# "+self.grn.format(" template :")+root+"/"+file+" "
                         template = self.load_tpl_file(root+"/"+file)
                         scoring.refresh_scope('template', self.tpl2esq(template))
-                        print "Nb of hits :"+str(scoring.get('template', 'total'))
+                        print "# Nb of hits :"+str(scoring.get('template', 'total'))
                         if scoring.get('template', 'total') > 0:
                             print self.grn.format("#  template matched, generating all rules.")
                             whitelists = self.gen_wl(template, rule={})
                             #x add here 
-                            print str(len(whitelists))+" whitelists ..."
+                            print "#" + str(len(whitelists))+" whitelists ..."
                             for genrule in whitelists:
                                 scoring.refresh_scope('rule', genrule['rule'])
                                 results = scoring.check_rule_score(template)
@@ -525,12 +525,13 @@ class NxTranslate():
         esq = self.tpl2esq(template)
         if x is not None:
             template[field] = x
-        esq['facets'] =  { "facet_results" : {"terms": { "field": field, "size" : self.es_max_size} }}
+        esq['aggregations'] =  { "facet_results" : {"terms": { "field": field, "size" : self.es_max_size} }}
         res = self.search(esq)
-        total = res['facets']['facet_results']['total']
+        # total = res['aggregations']['facet_results']['total']
         count = 0
-        for x in res['facets']['facet_results']['terms']:
-            print "# "+self.grn.format(x['term'])+" "+str(round( (float(x['count']) / total) * 100.0, 2))+" % (total:"+str(x['count'])+"/"+str(total)+")"
+        for x in res['aggregations']['facet_results']['buckets']:
+            # print "# "+self.grn.format(x['key'])+" "+str(round( (float(x['doc_count']) / total) * 100.0, 2))+" % (total:"+str(x['count'])+"/"+str(total)+")"
+            print "# "+self.grn.format(x['key'])+" "+str(x['doc_count'])
             count += 1
             if count > limit:
                 break
@@ -539,11 +540,11 @@ class NxTranslate():
         values and their associated match count """
         uniques = []
         esq = self.tpl2esq(rule)
-        esq['facets'] =  { "facet_results" : {"terms": { "field": key, "size" : 50000} }}
+        esq['aggregations'] =  { "facet_results" : {"terms": { "field": key, "size" : 50000} }}
         res = self.search(esq)
-        for x in res['facets']['facet_results']['terms']:
-            if x['term'] not in uniques:
-                uniques.append(x['term'])
+        for x in res['aggregations']['facet_results']['buckets']:
+            if x['key'] not in uniques:
+                uniques.append(x['key'])
         return { 'list' : uniques, 'total' :  len(uniques) }
     def index(self, body, eid):
         return self.es.index(index=self.cfg["elastic"]["index"], doc_type=self.cfg["elastic"]["doctype"], body=body, id=eid)
