@@ -47,7 +47,7 @@ class NxRating():
     def refresh_scope(self, scope, esq):
         """ drops all datas for a named scope """
         if scope not in self.esq.keys():
-            print "Unknown scope ?!"+scope
+            print "# Unknown scope ?!"+scope
         self.esq[scope] = esq
         self.stats[scope] = {}
     def query_ratio(self, scope, scope_small, score, force_refresh):
@@ -105,11 +105,11 @@ class NxRating():
                 res = self.check_rule(k, scheck[k])
                 if res['check'] is True:
                     if debug is True:
-                        print "[SUCCESS] OK, on "+k+" vs "+str(res['curr'])+", check :"+str(scheck[k][0])+" - "+str(scheck[k][1])
+                        print "# [SUCCESS] OK, on "+k+" vs "+str(res['curr'])+", check :"+str(scheck[k][0])+" - "+str(scheck[k][1])
                     success.append({'key' : k, 'criteria' : scheck[k], 'curr' : res['curr']})
                 else:
                     if debug is True:
-                        print "[SUCCESS] KO, on "+k+" vs "+str(res['curr'])+", check :"+str(scheck[k][0])+" - "+str(scheck[k][1])
+                        print "# [SUCCESS] KO, on "+k+" vs "+str(res['curr'])+", check :"+str(scheck[k][0])+" - "+str(scheck[k][1])
                     failed_tests["success"].append({'key' : k, 'criteria' : scheck[k], 'curr' : res['curr']})
                 
         for fcheck in [glb_warnings, tpl_warnings]:
@@ -119,11 +119,11 @@ class NxRating():
                 res = self.check_rule(k, fcheck[k])
                 if res['check'] is True:
                     if debug is True:
-                        print "[WARNINGS] TRIGGERED, on "+k+" vs "+str(res['curr'])+", check :"+str(fcheck[k][0])+" - "+str(fcheck[k][1])
+                        print "# [WARNINGS] TRIGGERED, on "+k+" vs "+str(res['curr'])+", check :"+str(fcheck[k][0])+" - "+str(fcheck[k][1])
                     warning.append({'key' : k, 'criteria' : fcheck[k], 'curr' : res['curr']})
                 else:
                     if debug is True:
-                        print "[WARNINGS] NOT TRIGGERED, on "+k+" vs "+str(res['curr'])+", check :"+str(fcheck[k][0])+" - "+str(fcheck[k][1])
+                        print "# [WARNINGS] NOT TRIGGERED, on "+k+" vs "+str(res['curr'])+", check :"+str(fcheck[k][0])+" - "+str(fcheck[k][1])
                     failed_tests["warnings"].append({'key' : k, 'criteria' : fcheck[k], 'curr' : res['curr']})
         x = { 'success' : success,
               'warnings' : warning,
@@ -155,7 +155,7 @@ class NxRating():
             #Xpprint.pprint()
             return {'curr' : x, 'check' : check(int(self.get(scope, score, scope_small=scope_small)), int(beat))}
         else:
-            print "cannot understand rule ("+label+"):",
+            print "# cannot understand rule ("+label+"):",
             pprint.pprint(check_rule)
             return { 'curr' : 0, 'check' : False }
 
@@ -203,7 +203,7 @@ class NxTranslate():
 
         scoring.refresh_scope("global", self.cfg["global_filters"])
         if scoring.get("global", "ip") <= 0:
-            print "No hits for this filter."
+            print "# No hits for this filter."
             return
         for sdir in self.cfg["naxsi"]["template_path"]:
             for root, dirs, files in os.walk(sdir):
@@ -468,7 +468,7 @@ class NxTranslate():
                 elif zone == "URL":
                     tpl.append({"match" : { "uri" : var_name }})
                 else:
-                    print "huh, what's that ? "+zone
+                    print "# huh, what's that ? "+zone
 
             # |<ZONE>
             else:
@@ -583,7 +583,7 @@ class NxTranslate():
         count = 0
         total_events = 0
         esq["size"] = "0"
-        print "TAG RULE :",
+        print "# TAG RULE :",
         pprint.pprint(esq)
         x = self.search(esq)
         total_events = int(str(x["hits"]["total"]))
@@ -607,7 +607,7 @@ class NxTranslate():
                 else:
                     print eid+",",
                 count += 1
-            print "Tagged {0} events out of {1}".format(count, total_events)
+            print "# Tagged {0} events out of {1}".format(count, total_events)
             if total_events - count < size:
                 size = total_events - count
         print ""
